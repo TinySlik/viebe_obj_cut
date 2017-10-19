@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/tiny/Desktop/develop/vibe_custom/vibe-background-sequential.c
+assert.h
+-
+time.h
+-
+vibe-background-sequential.h
+/Users/tiny/Desktop/develop/vibe_custom/vibe-background-sequential.h
+
+/Users/tiny/Desktop/develop/vibe_custom/vibe-background-sequential.h
+stdlib.h
+-
+stdint.h
+-
+stdio.h
+-
+string.h
+-
+

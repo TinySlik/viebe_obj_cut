@@ -1,0 +1,3 @@
+/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles/rebuild_cache.dir
+/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles/edit_cache.dir
+/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles/main.dir
