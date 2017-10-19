@@ -35,6 +35,8 @@ iostream
 -
 myVibe.h
 /Users/tiny/Desktop/develop/vibe_custom/myVibe.h
+time.h
+-
 
 /Users/tiny/Desktop/develop/vibe_custom/myVibe.cpp
 myVibe.h

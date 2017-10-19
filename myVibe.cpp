@@ -2,7 +2,8 @@
 
 myVibe::myVibe()
 {
-    model = NULL;
+  isNeedToBeUpdate = true;
+  model = NULL;
 }
 myVibe::~myVibe()
 {
@@ -20,7 +21,8 @@ bool myVibe::ProcessVideo(cv::Mat* inputFrame, cv::Mat* segmentationMap, long fr
 
     /* ViBe: Segmentation and updating. */
     libvibeModel_Sequential_Segmentation_8u_C3R(model, inputFrame->data, segmentationMap->data);
-    libvibeModel_Sequential_Update_8u_C3R(model, inputFrame->data, segmentationMap->data);
+    if(isNeedToBeUpdate)
+        libvibeModel_Sequential_Update_8u_C3R(model, inputFrame->data, segmentationMap->data);
 
     /* Post-processes the segmentation map. This step is not compulsory.
        Note that we strongly recommend to use post-processing filters, as they

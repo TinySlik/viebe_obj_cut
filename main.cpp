@@ -12,6 +12,7 @@
 #include <time.h>
 #include <iostream>
 #include "myVibe.h"
+#include <time.h>
 
 //using namespace openni;
 int GRAY_TH=0;//ÊäÈëÍ¼Ïñ·§Öµ»¯ *
@@ -50,19 +51,24 @@ int main(int argc, char* argv[])
 	Mat element_1 = getStructuringElement(MORPH_RECT,Size(5,5));
     Mat element = getStructuringElement(MORPH_RECT,Size(10,10));
     Mat element_3 = getStructuringElement(MORPH_CROSS,Size(30,30));
+    Mat res;
     int sobelThreshod = 2;
 
 	myVibe m_vibe;
+	m_vibe.setNeedToBeUpdate(false);
 	VideoCapture cap(0);
 	if(!cap.isOpened())
 	{
 		return -1;
 	}
+	cvNamedWindow("1");  
+
 	while((char)keyboard != 'q' && (char)keyboard != 27)
 	{
 		cap >> frameOrg;
+		clock_t start_time=clock();
 	    Size dsize = Size(frameOrg.cols*0.5,frameOrg.rows*0.5);
-	    Mat frame ;
+	    
 	    resize(frameOrg, frame,dsize);
 		Sobel(frame, XYImage, CV_16S, 1, 1, 2 * sobelThreshod + 1, 1, 10,BORDER_REPLICATE);  
 
@@ -75,19 +81,23 @@ int main(int argc, char* argv[])
         erode(XYImageG,XYImageG,element_1);
 		m_vibe.ProcessVideo(&frame, &segmentationMap, frameNumber);
 
-		Mat res = XYImageG & segmentationMap;
+		dilate(segmentationMap,segmentationMap,element);
+		dilate(XYImageG,XYImageG,element);
+
+		erode(XYImageG & segmentationMap,res,element);
+		//imshow("Resoult1", res);
 		
-		imshow("Resoult1", res);
-		dilate(res,res,element);
-		erode(res,res,element);
 		IplImage iplimg = res;
-		FillInternalContours(&iplimg,300);
-		imshow("Resoult2", res);
+		FillInternalContours(&iplimg,40000);
+		//imshow("Resoult2", res);
+		//imshow("Resoult2", res);
 		
-		//cvtColor(res, res, CV_GRAY2BGR);
-		//res = res & frame;
-        //imshow("Resoult", res);
+		cvtColor(res, res, CV_GRAY2BGR);
+		res = res & frame;
+        imshow("Resoult", res);
 		++frameNumber;
+		clock_t end_time=clock();
+		cout<< "Running time is: "<<static_cast<double>(end_time-start_time)/CLOCKS_PER_SEC*1000<<"ms"<<endl;//输出运行时间
 		keyboard = waitKey(1);
 	}
 
@@ -116,7 +126,7 @@ void FillInternalContours(IplImage *pBinary, double dAreaThre)
             // 内轮廓循环   
             for (pConInner = pContour->v_next; pConInner != NULL; pConInner = pConInner->h_next)   
             {   
-                // 内轮廓面积   
+                // 内轮廓面积  
                 dConArea = fabs(cvContourArea(pConInner, CV_WHOLE_SEQ));   
                 if (dConArea <= dAreaThre)   
                 {   
