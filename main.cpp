@@ -66,10 +66,9 @@ int main(int argc, char* argv[])
 	while((char)keyboard != 'q' && (char)keyboard != 27)
 	{
 		cap >> frameOrg;
-		clock_t start_time=clock();
 	    Size dsize = Size(frameOrg.cols*0.5,frameOrg.rows*0.5);
-	    
 	    resize(frameOrg, frame,dsize);
+	    clock_t start_time=clock();
 		Sobel(frame, XYImage, CV_16S, 1, 1, 2 * sobelThreshod + 1, 1, 10,BORDER_REPLICATE);  
 
         convertScaleAbs(XYImage, XYImage);  
