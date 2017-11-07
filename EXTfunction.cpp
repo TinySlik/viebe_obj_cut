@@ -12,6 +12,8 @@ using namespace cv;
 EXTfunction::EXTfunction()
 {
 	//to do
+	myMat= imread("frameBox3.png",-1); 
+	imageRotate(myMat, myMat, 30, false);
 }
 
 EXTfunction::~EXTfunction(){
@@ -74,9 +76,6 @@ bool EXTfunction::ProcessFrameBox(cv::Mat* in)
 {
     // to do
 	Size dsize = Size(in->cols/2,in->rows/2);
-	Mat myMat= imread("frameBox3.png",-1); 
-
-    imageRotate(myMat, myMat, 30, false);
 	resize(myMat, myMat,dsize);
 
 	Mat img1_t1(*in, cvRect(0, 0, myMat.cols, myMat.rows));  

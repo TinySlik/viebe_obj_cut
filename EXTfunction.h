@@ -25,7 +25,7 @@ public:
     	isNeedToBeUpdate = is;
     }
 private:
-
+	Mat myMat;
 	int cvAdd4cMat_q(cv::Mat &dst, cv::Mat &scr, double scale) ;
 	bool isNeedToBeUpdate;
 };

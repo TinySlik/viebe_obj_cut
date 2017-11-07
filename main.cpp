@@ -202,6 +202,8 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+	long long sumTime = 0;
+
 	while((char)keyboard != 'q' && (char)keyboard != 27)
 	{
 		cap >> frameOrg;
@@ -222,7 +224,7 @@ int main(int argc, char* argv[])
 
 	    double times = (double)getTickCount();
 	    
-#if 0 //VIBE
+#if 1 //VIBE
 	    //sobel 法高效的取得轮廓
 		Sobel(frame, XYImage, CV_16S, 1, 1, 2 * sobelThreshod + 1, 1, 10,BORDER_REPLICATE);  
         convertScaleAbs(XYImage, XYImage);  
@@ -254,10 +256,12 @@ int main(int argc, char* argv[])
 #else
         //imshow("VIBE Resoult", frame);
 #endif
-        //detectAndDraw( frame, cascade, nestedCascade, scale , false );
+        //face dect
+        detectAndDraw( frame, cascade, nestedCascade, scale , false );
 
-		//m_extension.ProcessFrameBox(&frame);
-
+        //hat and box
+		m_extension.ProcessFrameBox(&frame);
+#if 0   //skin beauty
 		imshow("Resault1", frame);
 
 		int KERNEL_SIZE = 31;  
@@ -266,12 +270,14 @@ int main(int argc, char* argv[])
 	    {  
 	        bilateralFilter(frameBfBil,frame,i,i*2,i/2);  
 	    }  
-		
+#endif		
 		imshow("Resault", frame);
 		++frameNumber;
 
 		times = (double)getTickCount() - times;
-    	printf( "Running time is: %g ms.\n", times*1000/getTickFrequency());
+		sumTime += times*1000/getTickFrequency();
+    	//printf( "Running time is: %g ms.\n", times*1000/getTickFrequency());
+    	printf( "avg cost time is: %lld ms.\n", sumTime/frameNumber);
 		keyboard = waitKey(1);
 	}
 
