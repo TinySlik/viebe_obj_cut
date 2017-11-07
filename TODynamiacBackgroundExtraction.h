@@ -1,5 +1,5 @@
-#ifndef MYVIBE_INCLUDED
-#define MYVIBE_INCLUDED
+#ifndef MTODBE_INCLUDED
+#define MTODBE_INCLUDED
 
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -10,11 +10,11 @@
 using namespace std;
 using namespace cv;
 
-class myVibe
+class TODynamiacBackgroundExtraction
 {
 public:
-    myVibe();
-    ~myVibe();
+    TODynamiacBackgroundExtraction();
+    ~TODynamiacBackgroundExtraction();
     bool ProcessVideo(cv::Mat* inputFrame, cv::Mat* segmentationMap, long frameNumber);
     void setNeedToBeUpdate(bool is)
     {

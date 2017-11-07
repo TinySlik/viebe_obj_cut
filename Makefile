@@ -124,6 +124,36 @@ main/fast:
 .PHONY : main/fast
 
 # target to build an object file
+EXTfunction.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/EXTfunction.o
+.PHONY : EXTfunction.o
+
+# target to preprocess a source file
+EXTfunction.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/EXTfunction.i
+.PHONY : EXTfunction.i
+
+# target to generate assembly for a file
+EXTfunction.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/EXTfunction.s
+.PHONY : EXTfunction.s
+
+# target to build an object file
+TODynamiacBackgroundExtraction.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o
+.PHONY : TODynamiacBackgroundExtraction.o
+
+# target to preprocess a source file
+TODynamiacBackgroundExtraction.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/TODynamiacBackgroundExtraction.i
+.PHONY : TODynamiacBackgroundExtraction.i
+
+# target to generate assembly for a file
+TODynamiacBackgroundExtraction.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/TODynamiacBackgroundExtraction.s
+.PHONY : TODynamiacBackgroundExtraction.s
+
+# target to build an object file
 main.o:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.o
 .PHONY : main.o
@@ -137,21 +167,6 @@ main.i:
 main.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.s
 .PHONY : main.s
-
-# target to build an object file
-myVibe.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/myVibe.o
-.PHONY : myVibe.o
-
-# target to preprocess a source file
-myVibe.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/myVibe.i
-.PHONY : myVibe.i
-
-# target to generate assembly for a file
-myVibe.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/myVibe.s
-.PHONY : myVibe.s
 
 # target to build an object file
 vibe-background-sequential.o:
@@ -177,12 +192,15 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... main"
+	@echo "... EXTfunction.o"
+	@echo "... EXTfunction.i"
+	@echo "... EXTfunction.s"
+	@echo "... TODynamiacBackgroundExtraction.o"
+	@echo "... TODynamiacBackgroundExtraction.i"
+	@echo "... TODynamiacBackgroundExtraction.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... myVibe.o"
-	@echo "... myVibe.i"
-	@echo "... myVibe.s"
 	@echo "... vibe-background-sequential.o"
 	@echo "... vibe-background-sequential.i"
 	@echo "... vibe-background-sequential.s"

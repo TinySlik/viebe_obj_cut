@@ -81,33 +81,57 @@ CMakeFiles/main.dir/main.o.provides: CMakeFiles/main.dir/main.o.requires
 CMakeFiles/main.dir/main.o.provides.build: CMakeFiles/main.dir/main.o
 
 
-CMakeFiles/main.dir/myVibe.o: CMakeFiles/main.dir/flags.make
-CMakeFiles/main.dir/myVibe.o: myVibe.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/myVibe.o"
-	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/myVibe.o -c /Users/tiny/Desktop/develop/vibe_custom/myVibe.cpp
+CMakeFiles/main.dir/EXTfunction.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/EXTfunction.o: EXTfunction.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/EXTfunction.o"
+	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/EXTfunction.o -c /Users/tiny/Desktop/develop/vibe_custom/EXTfunction.cpp
 
-CMakeFiles/main.dir/myVibe.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/myVibe.i"
-	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tiny/Desktop/develop/vibe_custom/myVibe.cpp > CMakeFiles/main.dir/myVibe.i
+CMakeFiles/main.dir/EXTfunction.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/EXTfunction.i"
+	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tiny/Desktop/develop/vibe_custom/EXTfunction.cpp > CMakeFiles/main.dir/EXTfunction.i
 
-CMakeFiles/main.dir/myVibe.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/myVibe.s"
-	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tiny/Desktop/develop/vibe_custom/myVibe.cpp -o CMakeFiles/main.dir/myVibe.s
+CMakeFiles/main.dir/EXTfunction.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/EXTfunction.s"
+	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tiny/Desktop/develop/vibe_custom/EXTfunction.cpp -o CMakeFiles/main.dir/EXTfunction.s
 
-CMakeFiles/main.dir/myVibe.o.requires:
+CMakeFiles/main.dir/EXTfunction.o.requires:
 
-.PHONY : CMakeFiles/main.dir/myVibe.o.requires
+.PHONY : CMakeFiles/main.dir/EXTfunction.o.requires
 
-CMakeFiles/main.dir/myVibe.o.provides: CMakeFiles/main.dir/myVibe.o.requires
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/myVibe.o.provides.build
-.PHONY : CMakeFiles/main.dir/myVibe.o.provides
+CMakeFiles/main.dir/EXTfunction.o.provides: CMakeFiles/main.dir/EXTfunction.o.requires
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/EXTfunction.o.provides.build
+.PHONY : CMakeFiles/main.dir/EXTfunction.o.provides
 
-CMakeFiles/main.dir/myVibe.o.provides.build: CMakeFiles/main.dir/myVibe.o
+CMakeFiles/main.dir/EXTfunction.o.provides.build: CMakeFiles/main.dir/EXTfunction.o
+
+
+CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o: CMakeFiles/main.dir/flags.make
+CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o: TODynamiacBackgroundExtraction.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o"
+	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o -c /Users/tiny/Desktop/develop/vibe_custom/TODynamiacBackgroundExtraction.cpp
+
+CMakeFiles/main.dir/TODynamiacBackgroundExtraction.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/TODynamiacBackgroundExtraction.i"
+	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/tiny/Desktop/develop/vibe_custom/TODynamiacBackgroundExtraction.cpp > CMakeFiles/main.dir/TODynamiacBackgroundExtraction.i
+
+CMakeFiles/main.dir/TODynamiacBackgroundExtraction.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/TODynamiacBackgroundExtraction.s"
+	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/tiny/Desktop/develop/vibe_custom/TODynamiacBackgroundExtraction.cpp -o CMakeFiles/main.dir/TODynamiacBackgroundExtraction.s
+
+CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.requires:
+
+.PHONY : CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.requires
+
+CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.provides: CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.requires
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.provides.build
+.PHONY : CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.provides
+
+CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.provides.build: CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o
 
 
 CMakeFiles/main.dir/vibe-background-sequential.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/vibe-background-sequential.o: vibe-background-sequential.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/main.dir/vibe-background-sequential.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/main.dir/vibe-background-sequential.o"
 	/Applications/developmentTools/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/main.dir/vibe-background-sequential.o   -c /Users/tiny/Desktop/develop/vibe_custom/vibe-background-sequential.c
 
 CMakeFiles/main.dir/vibe-background-sequential.i: cmake_force
@@ -132,14 +156,16 @@ CMakeFiles/main.dir/vibe-background-sequential.o.provides.build: CMakeFiles/main
 # Object files for target main
 main_OBJECTS = \
 "CMakeFiles/main.dir/main.o" \
-"CMakeFiles/main.dir/myVibe.o" \
+"CMakeFiles/main.dir/EXTfunction.o" \
+"CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o" \
 "CMakeFiles/main.dir/vibe-background-sequential.o"
 
 # External object files for target main
 main_EXTERNAL_OBJECTS =
 
 main: CMakeFiles/main.dir/main.o
-main: CMakeFiles/main.dir/myVibe.o
+main: CMakeFiles/main.dir/EXTfunction.o
+main: CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o
 main: CMakeFiles/main.dir/vibe-background-sequential.o
 main: CMakeFiles/main.dir/build.make
 main: /usr/local/lib/libopencv_dnn.3.3.0.dylib
@@ -160,7 +186,7 @@ main: /usr/local/lib/libopencv_imgcodecs.3.3.0.dylib
 main: /usr/local/lib/libopencv_imgproc.3.3.0.dylib
 main: /usr/local/lib/libopencv_core.3.3.0.dylib
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -169,7 +195,8 @@ CMakeFiles/main.dir/build: main
 .PHONY : CMakeFiles/main.dir/build
 
 CMakeFiles/main.dir/requires: CMakeFiles/main.dir/main.o.requires
-CMakeFiles/main.dir/requires: CMakeFiles/main.dir/myVibe.o.requires
+CMakeFiles/main.dir/requires: CMakeFiles/main.dir/EXTfunction.o.requires
+CMakeFiles/main.dir/requires: CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o.requires
 CMakeFiles/main.dir/requires: CMakeFiles/main.dir/vibe-background-sequential.o.requires
 
 .PHONY : CMakeFiles/main.dir/requires

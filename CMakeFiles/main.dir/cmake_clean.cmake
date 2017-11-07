@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/main.dir/main.o"
-  "CMakeFiles/main.dir/myVibe.o"
+  "CMakeFiles/main.dir/EXTfunction.o"
+  "CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o"
   "CMakeFiles/main.dir/vibe-background-sequential.o"
   "main.pdb"
   "main"

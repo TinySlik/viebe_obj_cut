@@ -1,15 +1,15 @@
-#include "myVibe.h"
+#include "TODynamiacBackgroundExtraction.h"
 
-myVibe::myVibe()
+TODynamiacBackgroundExtraction::TODynamiacBackgroundExtraction()
 {
   isNeedToBeUpdate = true;
   model = NULL;
 }
-myVibe::~myVibe()
+TODynamiacBackgroundExtraction::~TODynamiacBackgroundExtraction()
 {
     libvibeModel_Sequential_Free(model);
 }
-bool myVibe::ProcessVideo(cv::Mat* inputFrame, cv::Mat* segmentationMap, long frameNumber)
+bool TODynamiacBackgroundExtraction::ProcessVideo(cv::Mat* inputFrame, cv::Mat* segmentationMap, long frameNumber)
 {
     if ((frameNumber % 100) == 0) { cout << "Frame number = " << frameNumber << endl; }
 
