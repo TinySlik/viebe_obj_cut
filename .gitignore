@@ -2,6 +2,7 @@ bin/
 ### CMake template
 CMakeCache.txt
 CMakeFiles
+Makefile.cmake
 CMakeScripts
 Makefile
 cmake_install.cmake
