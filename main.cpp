@@ -13,6 +13,10 @@
 #include <time.h>
 #include "TODynamiacBackgroundExtraction.h"
 #include "EXTfunction.h"
+#include <pthread.h>
+
+using namespace std;
+#define NUM_THREADS 1
 
 int frameNumber = 1; 
 
@@ -25,94 +29,11 @@ using namespace std;
 string cascadeName;
 string nestedCascadeName;
 
-void detectAndDraw( Mat& img, CascadeClassifier& cascade,
-                    CascadeClassifier& nestedCascade,
-                    double scale, bool tryflip )
+// 线程的运行函数,函数返回的是函数指针，便于后面作为参数  
+void* say_hello(void* args)
 {
-    double t = 0;
-    vector<Rect> faces, faces2;
-    const static Scalar colors[] =
-    {
-        Scalar(255,0,0),
-        Scalar(255,128,0),
-        Scalar(255,255,0),
-        Scalar(0,255,0),
-        Scalar(0,128,255),
-        Scalar(0,255,255),
-        Scalar(0,0,255),
-        Scalar(255,0,255)
-    };
-    Mat gray, smallImg;
-
-    cvtColor( img, gray, COLOR_BGR2GRAY );
-    double fx = 1 / scale;
-    resize( gray, smallImg, Size(), fx, fx, INTER_LINEAR );
-    equalizeHist( smallImg, smallImg );
-
-    t = (double)getTickCount();
-    cascade.detectMultiScale( smallImg, faces,
-        1.1, 2, 0
-        //|CASCADE_FIND_BIGGEST_OBJECT
-        //|CASCADE_DO_ROUGH_SEARCH
-        |CASCADE_SCALE_IMAGE,
-        Size(30, 30) );
-    if( tryflip )
-    {
-        flip(smallImg, smallImg, 1);
-        cascade.detectMultiScale( smallImg, faces2,
-                                 1.1, 2, 0
-                                 //|CASCADE_FIND_BIGGEST_OBJECT
-                                 //|CASCADE_DO_ROUGH_SEARCH
-                                 |CASCADE_SCALE_IMAGE,
-                                 Size(30, 30) );
-        for( vector<Rect>::const_iterator r = faces2.begin(); r != faces2.end(); ++r )
-        {
-            faces.push_back(Rect(smallImg.cols - r->x - r->width, r->y, r->width, r->height));
-        }
-    }
-    t = (double)getTickCount() - t;
-    printf( "detection time = %g ms\n", t*1000/getTickFrequency());
-    for ( size_t i = 0; i < faces.size(); i++ )
-    {
-        Rect r = faces[i];
-        Mat smallImgROI;
-        vector<Rect> nestedObjects;
-        Point center;
-        Scalar color = colors[i%8];
-        int radius;
-
-        double aspect_ratio = (double)r.width/r.height;
-        if( 0.75 < aspect_ratio && aspect_ratio < 1.3 )
-        {
-            center.x = cvRound((r.x + r.width*0.5)*scale);
-            center.y = cvRound((r.y + r.height*0.5)*scale);
-            radius = cvRound((r.width + r.height)*0.25*scale);
-            circle( img, center, radius, color, 3, 8, 0 );
-        }
-        else
-            rectangle( img, cvPoint(cvRound(r.x*scale), cvRound(r.y*scale)),
-                       cvPoint(cvRound((r.x + r.width-1)*scale), cvRound((r.y + r.height-1)*scale)),
-                       color, 3, 8, 0);
-        if( nestedCascade.empty() )
-            continue;
-        smallImgROI = smallImg( r );
-        nestedCascade.detectMultiScale( smallImgROI, nestedObjects,
-            1.1, 2, 0
-            //|CASCADE_FIND_BIGGEST_OBJECT
-            //|CASCADE_DO_ROUGH_SEARCH
-            //|CASCADE_DO_CANNY_PRUNING
-            |CASCADE_SCALE_IMAGE,
-            Size(30, 30) );
-        for ( size_t j = 0; j < nestedObjects.size(); j++ )
-        {
-            Rect nr = nestedObjects[j];
-            center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
-            center.y = cvRound((r.y + nr.y + nr.height*0.5)*scale);
-            radius = cvRound((nr.width + nr.height)*0.25*scale);
-            circle( img, center, radius, color, 3, 8, 0 );
-        }
-    }
-    imshow( "result", img );
+    cout << "Hello Runoob！" << endl;
+    return NULL;
 }
 
 void demoHelp()
@@ -164,19 +85,6 @@ int main(int argc, char* argv[])
 	/* Create GUI windows. */
 	demoHelp();
 
-	cascadeName = "./haarcascade_frontalface_alt.xml";
-    nestedCascadeName = "./haarcascade_eye_tree_eyeglasses.xml";
-    double scale = 1;
-
-    CascadeClassifier cascade, nestedCascade;
-  	if ( !nestedCascade.load( nestedCascadeName ) )
-        cerr << "WARNING: Could not load classifier cascade for nested objects" << endl;
-    if( !cascade.load( cascadeName ) )
-    {
-        cerr << "ERROR: Could not load classifier cascade" << endl;
-        return -1;
-    }
-
 	/* Variables. */
   	static int frameNumber = 1; /* The current frame number */
 	Mat frame;                  /* Current frame. */
@@ -203,6 +111,17 @@ int main(int argc, char* argv[])
 	}
 
 	long long sumTime = 0;
+	// 定义线程的 id 变量，多个变量使用数组
+    pthread_t tids[NUM_THREADS];
+    for(int i = 0; i < NUM_THREADS; ++i)
+    {
+        //参数依次是：创建的线程id，线程参数，调用的函数，传入的函数参数
+        int ret = pthread_create(&tids[i], NULL, say_hello, NULL);
+        if (ret != 0)
+        {
+           cout << "pthread_create error: error_code=" << ret << endl;
+        }
+    }
 
 	while((char)keyboard != 'q' && (char)keyboard != 27)
 	{
@@ -224,7 +143,7 @@ int main(int argc, char* argv[])
 
 	    double times = (double)getTickCount();
 	    
-#if 1 //VIBE
+#if 0 //VIBE
 	    //sobel 法高效的取得轮廓
 		Sobel(frame, XYImage, CV_16S, 1, 1, 2 * sobelThreshod + 1, 1, 10,BORDER_REPLICATE);  
         convertScaleAbs(XYImage, XYImage);  
@@ -257,21 +176,14 @@ int main(int argc, char* argv[])
         //imshow("VIBE Resoult", frame);
 #endif
         //face dect
-        detectAndDraw( frame, cascade, nestedCascade, scale , false );
+        m_extension.ProcessFaceDetect(&frame);
 
         //hat and box
-		m_extension.ProcessFrameBox(&frame);
-#if 0   //skin beauty
-		imshow("Resault1", frame);
-
-		int KERNEL_SIZE = 31;  
-		Mat frameBfBil = frame.clone();
-	    for (int i = 1; i < KERNEL_SIZE; i = i + 2)  
-	    {  
-	        bilateralFilter(frameBfBil,frame,i,i*2,i/2);  
-	    }  
+		//m_extension.ProcessFrameBox(&frame);
+#if 1   //skin beauty
+		//m_extension.ProcessFaceBeautification(frame);
 #endif		
-		imshow("Resault", frame);
+		//imshow("Res", frame);
 		++frameNumber;
 
 		times = (double)getTickCount() - times;
@@ -281,6 +193,8 @@ int main(int argc, char* argv[])
 		keyboard = waitKey(1);
 	}
 
+	//等各个线程退出后，进程才结束，否则进程强制结束了，线程可能还没反应过来；
+    pthread_exit(NULL);
 	cap.release();
 	destroyAllWindows();
 	return 0;
