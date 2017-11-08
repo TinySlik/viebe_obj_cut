@@ -111,14 +111,14 @@ bool EXTfunction::ProcessHatThings(cv::Mat& frame)
     {
     	//cout << i << ":" << faces[i]  << endl;
         Size dsize = Size(faces[i].width,faces[i].height);
-        resize(m_Hat, m_Hat,dsize);
+        Mat hh;
+        resize(m_Hat, hh,dsize);
 
         Mat newMat(frame, faces[i]); 
-        cvAdd4cMat_q(newMat,m_Hat,1.0);  
+        cvAdd4cMat_q(newMat,hh,1.0);  
         //cv::Mat imageROI= frame(faces[i]);
         //m_Hat.copyTo(imageROI);
     }
-    imshow("hello",m_Hat);
 
     return true;
 }
@@ -257,6 +257,7 @@ void EXTfunction::detectAndDraw( Mat& img, CascadeClassifier& cascade,
             radius = cvRound((nr.width + nr.height)*0.25*scale);
             circle( img, center, radius, color, 3, 8, 0 );
         }*/
+        faces[i] = cv::Rect(faces[i].x * 2,faces[i].y *2,faces[i].width*2,faces[i].height*2);
     }
 
     t = (double)getTickCount() - t;

@@ -42,6 +42,11 @@ public:
     }
 
     bool ProcessFaceBeautification(cv::Mat& frame);
+
+    void setDetScale(int num)
+    {
+    	m_Scale = num;
+    }
 private:
 
 	int prepareToProcessFaceDet();

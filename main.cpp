@@ -103,6 +103,7 @@ int main(int argc, char* argv[])
 	m_TOobject.setNeedToBeUpdate(false);
 
 	EXTfunction m_extension;
+	m_extension.setDetScale(2);
 
 	VideoCapture cap(0);
 	if(!cap.isOpened())
@@ -138,7 +139,7 @@ int main(int argc, char* argv[])
 			begin_frame_count++;
 			continue;
 		}
-	    Size dsize = Size(640,480);
+	    Size dsize = Size(320*2,240*2);
 	    resize(frameOrg, frame,dsize);
 
 	    double times = (double)getTickCount();
