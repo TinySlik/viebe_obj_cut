@@ -1,3 +1,0 @@
-/home/tiny/develop/viebe_obj_cut/CMakeFiles/rebuild_cache.dir
-/home/tiny/develop/viebe_obj_cut/CMakeFiles/edit_cache.dir
-/home/tiny/develop/viebe_obj_cut/CMakeFiles/main.dir
