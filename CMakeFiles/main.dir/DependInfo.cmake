@@ -5,9 +5,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/Users/tiny/Desktop/develop/vibe_custom/vibe-background-sequential.c" "/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles/main.dir/vibe-background-sequential.o"
+  "/home/tiny/develop/viebe_obj_cut/vibe-background-sequential.c" "/home/tiny/develop/viebe_obj_cut/CMakeFiles/main.dir/vibe-background-sequential.o"
   )
-set(CMAKE_C_COMPILER_ID "Clang")
+set(CMAKE_C_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
@@ -15,11 +15,11 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "/usr/local/include/opencv"
   )
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/tiny/Desktop/develop/vibe_custom/EXTfunction.cpp" "/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles/main.dir/EXTfunction.o"
-  "/Users/tiny/Desktop/develop/vibe_custom/TODynamiacBackgroundExtraction.cpp" "/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o"
-  "/Users/tiny/Desktop/develop/vibe_custom/main.cpp" "/Users/tiny/Desktop/develop/vibe_custom/CMakeFiles/main.dir/main.o"
+  "/home/tiny/develop/viebe_obj_cut/EXTfunction.cpp" "/home/tiny/develop/viebe_obj_cut/CMakeFiles/main.dir/EXTfunction.o"
+  "/home/tiny/develop/viebe_obj_cut/TODynamiacBackgroundExtraction.cpp" "/home/tiny/develop/viebe_obj_cut/CMakeFiles/main.dir/TODynamiacBackgroundExtraction.o"
+  "/home/tiny/develop/viebe_obj_cut/main.cpp" "/home/tiny/develop/viebe_obj_cut/CMakeFiles/main.dir/main.o"
   )
-set(CMAKE_CXX_COMPILER_ID "Clang")
+set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
