@@ -178,12 +178,17 @@ int main(int argc, char* argv[])
         //face dect
         m_extension.ProcessFaceDetect(&frame);
 
-        //hat and box
-		//m_extension.ProcessFrameBox(&frame);
+        
 #if 1   //skin beauty
-		//m_extension.ProcessFaceBeautification(frame);
-#endif		
-		//imshow("Res", frame);
+		m_extension.ProcessFaceBeautification(frame);
+#endif	
+
+		m_extension.ProcessHatThings(frame);
+
+		//hat and box
+		m_extension.ProcessFrameBox(&frame);
+
+		imshow("Res", frame);
 		++frameNumber;
 
 		times = (double)getTickCount() - times;

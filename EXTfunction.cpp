@@ -24,7 +24,10 @@ EXTfunction::EXTfunction()
 {
 	//to do
 	myMat= imread("frameBox3.png",-1); 
-	imageRotate(myMat, myMat, 30, false);
+	//imageRotate(myMat, myMat, 30, false);
+
+	m_Hat= imread("hat2.png",-1);
+	imageRotate(m_Hat, m_Hat, 10, false);
 
 	if(prepareToProcessFaceDet())
 	{
@@ -91,7 +94,7 @@ int EXTfunction::imageRotate(InputArray src, OutputArray dst, double angle, bool
 bool EXTfunction::ProcessFrameBox(cv::Mat* in)
 {
     // to do
-	Size dsize = Size(in->cols/2,in->rows/2);
+	Size dsize = Size(in->cols,in->rows);
 	resize(myMat, myMat,dsize);
 
 	Mat img1_t1(*in, cvRect(0, 0, myMat.cols, myMat.rows));  
@@ -99,6 +102,24 @@ bool EXTfunction::ProcessFrameBox(cv::Mat* in)
 	//imshow("Resoult2", img1_t1);
 	
 	//*in = *in + myMat;
+    return true;
+}
+
+bool EXTfunction::ProcessHatThings(cv::Mat& frame)
+{
+	for ( size_t i = 0; i < faces.size(); i++ )
+    {
+    	//cout << i << ":" << faces[i]  << endl;
+        Size dsize = Size(faces[i].width,faces[i].height);
+        resize(m_Hat, m_Hat,dsize);
+
+        Mat newMat(frame, faces[i]); 
+        cvAdd4cMat_q(newMat,m_Hat,1.0);  
+        //cv::Mat imageROI= frame(faces[i]);
+        //m_Hat.copyTo(imageROI);
+    }
+    imshow("hello",m_Hat);
+
     return true;
 }
 
@@ -202,8 +223,8 @@ void EXTfunction::detectAndDraw( Mat& img, CascadeClassifier& cascade,
         Rect r = faces[i];
         Mat smallImgROI;
         vector<Rect> nestedObjects;
-        Point center;
-        Scalar color = colors[i%8];
+        //Point center;
+        //Scalar color = colors[i%8];
         int radius;
 
         /*double aspect_ratio = (double)r.width/r.height;
@@ -239,7 +260,7 @@ void EXTfunction::detectAndDraw( Mat& img, CascadeClassifier& cascade,
     }
 
     t = (double)getTickCount() - t;
-    printf( "detection time = %g ms\n", t*1000/getTickFrequency());
+    //printf( "detection time = %g ms\n", t*1000/getTickFrequency());
     //imshow( "result", img );
 } 
 
@@ -254,10 +275,17 @@ bool EXTfunction::ProcessFaceDetect(cv::Mat* in)
 bool EXTfunction::ProcessFaceBeautification(cv::Mat& frame)
 {
 	int KERNEL_SIZE = 31;  
-	Mat frameBfBil = frame.clone();
-    for (int i = 1; i < KERNEL_SIZE; i = i + 2)  
-    {  
-        bilateralFilter(frameBfBil,frame,i,i*2,i/2);  
-    } 
+	
+    for ( size_t i = 0; i < faces.size(); i++ )
+    {
+    	cout << i << ": " << faces[i]  << endl;
+        int radius;
+        Mat image_ori = frame(faces[i]);
+        Mat frameBfBil = image_ori.clone();
+	    for (int i = 1; i < KERNEL_SIZE; i = i + 2)  
+	    {  
+	        bilateralFilter(frameBfBil,image_ori,i,i*2,i/2);  
+	    } 
+    }
     return true; 
 }

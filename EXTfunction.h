@@ -19,6 +19,8 @@ public:
 
     bool ProcessFrameBox(cv::Mat* in);
 
+    bool ProcessHatThings(cv::Mat& frame);
+
     int imageRotate(InputArray src, OutputArray dst, double angle, bool isClip);
     
     void setNeedToBeUpdate(bool is)
@@ -40,7 +42,6 @@ public:
     }
 
     bool ProcessFaceBeautification(cv::Mat& frame);
-    
 private:
 
 	int prepareToProcessFaceDet();
@@ -48,6 +49,7 @@ private:
                     CascadeClassifier& nestedCascade,
                     double scale, bool tryflip );
 	Mat myMat;
+	Mat m_Hat;
 	int cvAdd4cMat_q(cv::Mat &dst, cv::Mat &scr, double scale) ;
 	bool isNeedToBeUpdate;
 
