@@ -43,16 +43,29 @@ public:
 
     bool ProcessFaceBeautification(cv::Mat& frame);
 
-    void setDetScale(int num)
+    void setDetScale(double num)
     {
     	m_Scale = num;
     }
-private:
 
+    void setEyesDetScale(double num)
+    {
+        m_eyeDecScale = num;
+    }
+
+private:
+    void initDetectors(CascadeClassifier &faceCascade, CascadeClassifier &eyeCascade1, CascadeClassifier &eyeCascade2);
+    /*
 	int prepareToProcessFaceDet();
 	void detectAndDraw( Mat& img, CascadeClassifier& cascade,
                     CascadeClassifier& nestedCascade,
-                    double scale, bool tryflip );
+                    double scale, bool tryflip );*/
+
+    Rect faceRect;  // 检测出来的人脸的位置
+    Rect searchedLeftEye, searchedRightEye; //左右眼检测
+    Point leftEye, rightEye;    // 标记检测出来的眼睛
+    bool gotFaceAndEyes ;
+
 	Mat myMat;
 	Mat m_Hat;
 	int cvAdd4cMat_q(cv::Mat &dst, cv::Mat &scr, double scale) ;
@@ -60,12 +73,19 @@ private:
 
 	string cascadeName;
 	string nestedCascadeName;
-
+/*
 	CascadeClassifier cascade;
 	CascadeClassifier nestedCascade;
+*/
+    CascadeClassifier faceCascade;
+    CascadeClassifier eyeCascade1;
+    CascadeClassifier eyeCascade2;
+
+    double m_rtHat ;
 
 	vector<Rect> faces,faces2;
 	cv::Mat* m_dectedPreMat;
 	double m_Scale;
+    double m_eyeDecScale;
 };
 #endif

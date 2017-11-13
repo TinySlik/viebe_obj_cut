@@ -16,23 +16,50 @@
 #include <pthread.h>
 #include "vibe-background-sequential.h"
 #include <pthread.h>
+#include "detectObject.h"
+#include "preprocessFace.h"
+#include <math.h>
 
 using namespace cv;
 using namespace std;
 
+// 设置期望的人脸维度，设置为70*70
+const int faceWidth = 70;
+const int faceHeight = faceWidth;
+
+const bool preprocessLeftAndRightSeparately = true;   // 是否分别对左侧和右侧人脸进行处理的标志
+
+// 级联分类器
+const char *faceCascadeFilename = "./haarcascade_frontalface_alt.xml";     // LBP face detector.
+//const char *faceCascadeFilename = "C:/opencv/sources/data/lbpcascades/haarcascade_frontalface_alt_tree.xml";  // Haar face detector.
+//const char *eyeCascadeFilename1 = "C:/opencv/sources/data/lbpcascades/haarcascade_lefteye_2splits.xml";   // Best eye detector for open-or-closed eyes.
+//const char *eyeCascadeFilename2 = "C:/opencv/sources/data/lbpcascades/haarcascade_righteye_2splits.xml";   // Best eye detector for open-or-closed eyes.
+//const char *eyeCascadeFilename1 = "C:/opencv/sources/data/lbpcascades/haarcascade_mcs_lefteye.xml";       // Good eye detector for open-or-closed eyes.
+//const char *eyeCascadeFilename2 = "C:/opencv/sources/data/lbpcascades/haarcascade_mcs_righteye.xml";       // Good eye detector for open-or-closed eyes.
+const char *eyeCascadeFilename1 = "./haarcascade_eye.xml";               // Basic eye detector for open eyes only.
+const char *eyeCascadeFilename2 = "./haarcascade_eye_tree_eyeglasses.xml"; // Basic eye detector for open eyes if they might wear glasses.
+
+
 EXTfunction::EXTfunction()
 {
+    m_Scale = 1;
+    m_eyeDecScale =  1;
+    gotFaceAndEyes = false;
+    m_rtHat  = 0;
 	//to do
 	myMat= imread("frameBox3.png",-1); 
 	//imageRotate(myMat, myMat, 30, false);
 
 	m_Hat= imread("hat2.png",-1);
-	imageRotate(m_Hat, m_Hat, 10, false);
+	
 
-	if(prepareToProcessFaceDet())
+	/*if(prepareToProcessFaceDet())
 	{
 		cerr << "WARNING: classifier filed to load" << endl;
-	}
+	}*/
+
+    //载入XML分类器
+    initDetectors(faceCascade, eyeCascade1, eyeCascade2);
 }
 
 EXTfunction::~EXTfunction(){
@@ -107,18 +134,36 @@ bool EXTfunction::ProcessFrameBox(cv::Mat* in)
 
 bool EXTfunction::ProcessHatThings(cv::Mat& frame)
 {
-	for ( size_t i = 0; i < faces.size(); i++ )
+    if(!gotFaceAndEyes)
     {
-    	//cout << i << ":" << faces[i]  << endl;
-        Size dsize = Size(faces[i].width,faces[i].height);
-        Mat hh;
-        resize(m_Hat, hh,dsize);
-
-        Mat newMat(frame, faces[i]); 
-        cvAdd4cMat_q(newMat,hh,1.0);  
-        //cv::Mat imageROI= frame(faces[i]);
-        //m_Hat.copyTo(imageROI);
+        return false;
     }
+    if(faceRect.width   < 10 || faceRect.height < 10)
+    {
+        return false;
+    }
+
+    Mat ne ;
+    //Mat ne = imread("hat2.png",-1);
+    //cout <<  m_rtHat << endl;
+    if(abs(m_rtHat) < 20)
+        imageRotate(m_Hat, ne, m_rtHat, false);
+    else
+    {
+        return false;
+    }
+
+    //imageRotate(m_Hat, ne, m_rtHat, false);
+    //imshow("m_Hat",m_Hat);
+
+    Size dsize = Size(faceRect.width,faceRect.height);
+    Mat hh ;
+    resize(ne, hh,dsize);
+
+    Mat newMat(frame, faceRect); 
+    //Mat nn;
+    //imageRotate(hh, nn, m_rtHat, false);
+    cvAdd4cMat_q(newMat,hh,1.0); 
 
     return true;
 }
@@ -150,12 +195,11 @@ int EXTfunction::cvAdd4cMat_q(cv::Mat &dst, cv::Mat &scr, double scale)
     merge(dstt_channels, dst);    
     return true;    
 }   
-
+/*
 int EXTfunction::prepareToProcessFaceDet()
 {
 	cascadeName = "./haarcascade_frontalface_alt.xml";
     nestedCascadeName = "./haarcascade_eye_tree_eyeglasses.xml";
-    m_Scale = 1;
 
   	if ( !nestedCascade.load(nestedCascadeName))
   	{
@@ -168,8 +212,53 @@ int EXTfunction::prepareToProcessFaceDet()
         return -1;
     }
     return 0;
+}*/
+
+// 加载人脸和左眼、右眼的检测器
+void EXTfunction::initDetectors(CascadeClassifier &faceCascade, CascadeClassifier &eyeCascade1, CascadeClassifier &eyeCascade2)
+{
+    // 载入人脸检测级联分类器-xml文件
+    try 
+    {   
+        faceCascade.load(faceCascadeFilename);
+    } 
+    catch (cv::Exception &e) 
+    { }
+    if ( faceCascade.empty() ) 
+    {
+        cerr << "ERROR: 载入人脸检测级联分类器[" << faceCascadeFilename << "]失败!" << endl;
+        exit(1);
+    }
+    cout << "载入人脸检测级联分类器[" << faceCascadeFilename << "]成功。" << endl;
+
+    //// 载入眼睛检测级联分类器-xml文件 
+    try {   
+        eyeCascade1.load(eyeCascadeFilename1);
+    } 
+    catch (cv::Exception &e) 
+    {}
+    if ( eyeCascade1.empty() ) 
+    {
+        cerr << "ERROR:载入第一个眼睛检测级联分类器[" << eyeCascadeFilename1 << "]失败!" << endl;
+       exit(1);
+    }
+    cout << "载入第一个眼睛检测级联分类器[" << eyeCascadeFilename1 << "]成功。" << endl;
+
+    try {  
+        eyeCascade2.load(eyeCascadeFilename2);
+    } 
+    catch (cv::Exception &e) 
+    {}
+    if ( eyeCascade2.empty() ) 
+    {
+        cerr << "ERROR:载入第二个眼睛检测级联分类器[" << eyeCascadeFilename2 << "]失败！" << endl;
+        exit(1);
+    }
+    else
+        cout << "载入第二个眼睛检测级联分类器[" << eyeCascadeFilename2 << "]成功。" << endl;
 }
 
+/*
 void EXTfunction::detectAndDraw( Mat& img, CascadeClassifier& cascade,
                     CascadeClassifier& nestedCascade,
                     double scale, bool tryflip )
@@ -223,11 +312,11 @@ void EXTfunction::detectAndDraw( Mat& img, CascadeClassifier& cascade,
         Rect r = faces[i];
         Mat smallImgROI;
         vector<Rect> nestedObjects;
-        //Point center;
-        //Scalar color = colors[i%8];
+        Point center;
+        Scalar color = colors[i%8];
         int radius;
 
-        /*double aspect_ratio = (double)r.width/r.height;
+        double aspect_ratio = (double)r.width/r.height;
         if( 0.75 < aspect_ratio && aspect_ratio < 1.3 )
         {
             center.x = cvRound((r.x + r.width*0.5)*scale);
@@ -238,10 +327,12 @@ void EXTfunction::detectAndDraw( Mat& img, CascadeClassifier& cascade,
         else
             rectangle( img, cvPoint(cvRound(r.x*scale), cvRound(r.y*scale)),
                        cvPoint(cvRound((r.x + r.width-1)*scale), cvRound((r.y + r.height-1)*scale)),
-                       color, 3, 8, 0);*/
+                       color, 3, 8, 0);
         if( nestedCascade.empty() )
             continue;
         smallImgROI = smallImg( r );
+        Size dsize = Size(r.width*m_eyeDecScale,r.height*m_eyeDecScale);
+        resize( smallImgROI, smallImgROI, dsize);
         nestedCascade.detectMultiScale( smallImgROI, nestedObjects,
             1.1, 2, 0
             //|CASCADE_FIND_BIGGEST_OBJECT
@@ -249,44 +340,98 @@ void EXTfunction::detectAndDraw( Mat& img, CascadeClassifier& cascade,
             //|CASCADE_DO_CANNY_PRUNING
             |CASCADE_SCALE_IMAGE,
             Size(30, 30) );
-        /*for ( size_t j = 0; j < nestedObjects.size(); j++ )
+        if(nestedObjects.size() == 2)
+        {
+            for ( size_t j = 0; j < nestedObjects.size(); j++ )
         {
             Rect nr = nestedObjects[j];
-            center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
-            center.y = cvRound((r.y + nr.y + nr.height*0.5)*scale);
-            radius = cvRound((nr.width + nr.height)*0.25*scale);
-            circle( img, center, radius, color, 3, 8, 0 );
-        }*/
-        faces[i] = cv::Rect(faces[i].x * 2,faces[i].y *2,faces[i].width*2,faces[i].height*2);
+                nr = Rect(nr.x/m_eyeDecScale,nr.y/m_eyeDecScale,nr.width/m_eyeDecScale,nr.height/m_eyeDecScale);
+                center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
+                center.y = cvRound((r.y + nr.y + nr.height*0.5)*scale);
+                radius = cvRound((nr.width + nr.height)*0.25*scale);
+                circle( img, center, radius, color, 3, 8, 0 );
+            }
+        }
+        
+        faces[i] = cv::Rect(faces[i].x * m_Scale,faces[i].y *m_Scale,faces[i].width*m_Scale,faces[i].height*m_Scale);
     }
 
     t = (double)getTickCount() - t;
     //printf( "detection time = %g ms\n", t*1000/getTickFrequency());
     //imshow( "result", img );
 } 
-
+*/
 bool EXTfunction::ProcessFaceDetect(cv::Mat* in)
 {
 	changeDetMat(in);
-	detectAndDraw( *m_dectedPreMat, cascade, nestedCascade, m_Scale , false );
+    //faces.clear();
+    //检测到人脸并进行预处理（需要标准大小，对比度和亮度）
+    double fx = 1 / m_Scale;
+    Mat in2   =  in->clone();
+    resize( in2, in2, Size(), fx, fx, INTER_LINEAR );
+
+    Mat preprocessedFace = getPreprocessedFace(in2, faceWidth, faceCascade, eyeCascade1, eyeCascade2, preprocessLeftAndRightSeparately, &faceRect, &leftEye, &rightEye, &searchedLeftEye, &searchedRightEye);
+    //faces.push_back(faceRect);
+    gotFaceAndEyes = false;
+    if (preprocessedFace.data)
+        gotFaceAndEyes = true;
+    faceRect = cv::Rect(faceRect.x * m_Scale,faceRect.y *m_Scale,faceRect.width*m_Scale,faceRect.height*m_Scale);
+    leftEye *=  m_Scale;
+    rightEye *=   m_Scale;
+
+    Point  face_center ;
+    // 在检测到的人脸周围绘制一个矩形
+    if (faceRect.width > 0) 
+    {
+        face_center =  Point(faceRect.x + faceRect.width/2, faceRect.y + faceRect.height/2);
+        //rectangle(*in, faceRect, CV_RGB(255, 255, 0), 2, CV_AA);
+
+        // 用蓝线画出眼睛的位置
+        Scalar eyeColor = CV_RGB(0,255,255);
+        if (leftEye.x >= 0 && rightEye.x >= 0) 
+        {   
+            //circle(*in, face_center, 6, eyeColor, 1, CV_AA);
+
+            //circle(*in, Point(faceRect.x + leftEye.x, faceRect.y + leftEye.y), 6, eyeColor, 1, CV_AA);
+
+            //circle(*in, Point(faceRect.x + rightEye.x, faceRect.y + rightEye.y), 6, eyeColor, 1, CV_AA);
+        }
+    }
+
+    double ss = atan((double)(leftEye.y - rightEye.y)/(double)(leftEye.x-rightEye.x)) * 180/3.1415926;
+    if(abs(ss) > 30  || abs(ss - m_rtHat)  > 30)
+    {
+        //
+    }else
+    {
+        m_rtHat = ss;
+    }
+    //cout <<": " << m_rtHat << endl;
+
+	//detectAndDraw( *m_dectedPreMat, cascade, nestedCascade, m_Scale , false );
 
 	return true;
 }
 
 bool EXTfunction::ProcessFaceBeautification(cv::Mat& frame)
 {
-	int KERNEL_SIZE = 31;  
-	
-    for ( size_t i = 0; i < faces.size(); i++ )
+    if(!gotFaceAndEyes)
     {
-    	cout << i << ": " << faces[i]  << endl;
-        int radius;
-        Mat image_ori = frame(faces[i]);
-        Mat frameBfBil = image_ori.clone();
-	    for (int i = 1; i < KERNEL_SIZE; i = i + 2)  
-	    {  
-	        bilateralFilter(frameBfBil,image_ori,i,i*2,i/2);  
-	    } 
+        return false;
     }
-    return true; 
+
+    if(faceRect.width < 10 || faceRect.height < 10)
+    {
+        return false;
+    }
+
+	int KERNEL_SIZE = 31;  
+	//cout <<": " << faceRect  << endl;
+    int radius;
+    Mat image_ori = frame(faceRect);
+    Mat frameBfBil = image_ori.clone();
+    for (int i = 1; i < KERNEL_SIZE; i = i + 2)  
+    {  
+        bilateralFilter(frameBfBil,image_ori,i,i*2,i/2);  
+    } 
 }

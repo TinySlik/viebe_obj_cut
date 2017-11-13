@@ -1,7 +1,6 @@
-   project( VIBE_EX )
-
+   project( CV_TEST )
    find_package(Threads)
+   find_package( OpenCV 3.1.0 REQUIRED )
+   add_executable(main main.cpp EXTfunction.cpp  TODynamiacBackgroundExtraction.cpp vibe-background-sequential.c detectObject.cpp preprocessFace.cpp ImageUtils_0.7.cpp)
    target_link_libraries(main ${CMAKE_THREAD_LIBS_INIT})
-   find_package( OpenCV REQUIRED )
-   add_executable(main main.cpp EXTfunction.cpp  TODynamiacBackgroundExtraction.cpp vibe-background-sequential.c)
    target_link_libraries( main ${OpenCV_LIBS} )
