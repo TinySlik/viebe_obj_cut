@@ -36,6 +36,8 @@ public:
 
     bool ProcessFaceDetect(cv::Mat* in);
 
+    bool  ProcessEye(cv::Mat& in);
+
     const vector<Rect>& getFaces()
     {
     	return faces;
@@ -53,8 +55,12 @@ public:
         m_eyeDecScale = num;
     }
 
+    
 private:
     void initDetectors(CascadeClassifier &faceCascade, CascadeClassifier &eyeCascade1, CascadeClassifier &eyeCascade2);
+
+    void MaxFrame(IplImage* frame);
+    void MinFrame(IplImage* frame);
     /*
 	int prepareToProcessFaceDet();
 	void detectAndDraw( Mat& img, CascadeClassifier& cascade,
@@ -81,9 +87,13 @@ private:
     CascadeClassifier eyeCascade1;
     CascadeClassifier eyeCascade2;
 
+    unsigned int m_eyesStaticCount;
+    unsigned int  m_faceStaticCount;
+
     double m_rtHat ;
 
 	vector<Rect> faces,faces2;
+    Point m_eyesWeight;
 	cv::Mat* m_dectedPreMat;
 	double m_Scale;
     double m_eyeDecScale;

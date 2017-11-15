@@ -179,13 +179,13 @@ int main(int argc, char* argv[])
 #endif
         //face dect
         m_extension.ProcessFaceDetect(&frame);
-
         
-#if 0   //skin beauty
+   		//skin beauty
 		m_extension.ProcessFaceBeautification(frame);
-#endif	
 
 		m_extension.ProcessHatThings(frame);
+
+		m_extension.ProcessEye(frame);
 
 		//hat and box
 		m_extension.ProcessFrameBox(&frame);
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 		times = (double)getTickCount() - times;
 		sumTime += times*1000/getTickFrequency();
     	//printf( "Running time is: %g ms.\n", times*1000/getTickFrequency());
-    	printf( "avg cost time is: %lld ms.\n", sumTime/frameNumber);
+    	printf( "cust frame time  %lf ,avg cost time is: %lld ms.\n",times*1000/getTickFrequency(), sumTime/frameNumber);
 		keyboard = waitKey(1);
 	}
 

@@ -23,6 +23,9 @@
 using namespace cv;
 using namespace std;
 
+#define EYE_STATIC_THE 10
+#define FACE_STATIC_THE 10
+
 // 设置期望的人脸维度，设置为70*70
 const int faceWidth = 70;
 const int faceHeight = faceWidth;
@@ -52,7 +55,11 @@ EXTfunction::EXTfunction()
 
 	m_Hat= imread("hat2.png",-1);
 	
+    m_eyesStaticCount =  0;
 
+    m_faceStaticCount = 0;
+
+    m_eyesWeight = Point(1,1);
 	/*if(prepareToProcessFaceDet())
 	{
 		cerr << "WARNING: classifier filed to load" << endl;
@@ -65,6 +72,98 @@ EXTfunction::EXTfunction()
 EXTfunction::~EXTfunction(){
 	// to do
 }
+
+void EXTfunction::MaxFrame(IplImage* frame)  
+{  
+    uchar* old_data = (uchar*)frame->imageData;  
+    uchar* new_data = new uchar[frame->widthStep * frame->height];  
+  
+    int center_X = frame->width / 2;  
+    int center_Y = frame->height / 2;  
+    int radius = frame->height;  
+    int newX = 0;  
+    int newY = 0;  
+  
+    int real_radius = (int)(radius / 2.0);  
+    for (int i = 0; i < frame->width; i++)  
+    {  
+        for (int j = 0; j < frame->height; j++)  
+        {  
+            int tX = i - center_X;  
+            int tY = j - center_Y;  
+  
+            int distance = (int)(tX * tX + tY * tY);  
+            if (distance < radius * radius)  
+            {  
+                newX = (int)((float)(tX) / 2.0);  
+                newY = (int)((float)(tY) / 2.0);  
+  
+                newX = (int) (newX * (sqrt((double)distance) / real_radius));  
+                newX = (int) (newX * (sqrt((double)distance) / real_radius));  
+  
+                newX = newX + center_X;  
+                newY = newY + center_Y;  
+  
+                new_data[frame->widthStep * j + i * 3] = old_data[frame->widthStep * newY + newX * 3];  
+                new_data[frame->widthStep * j + i * 3 + 1] =old_data[frame->widthStep * newY + newX * 3 + 1];  
+                new_data[frame->widthStep * j + i * 3 + 2] =old_data[frame->widthStep * newY + newX * 3 + 2];  
+            }  
+            else  
+            {  
+                new_data[frame->widthStep * j + i * 3] =  old_data[frame->widthStep * j + i * 3];  
+                new_data[frame->widthStep * j + i * 3 + 1] =  old_data[frame->widthStep * j + i * 3 + 1];  
+                new_data[frame->widthStep * j + i * 3 + 2] =  old_data[frame->widthStep * j + i * 3 + 2];  
+            }  
+        }  
+    }  
+    memcpy(old_data, new_data, sizeof(uchar) * frame->widthStep * frame->height);  
+    delete[] new_data;  
+}  
+  
+  
+void EXTfunction::MinFrame(IplImage* frame)  
+{  
+    uchar* old_data = (uchar*)frame->imageData;  
+    uchar* new_data = new uchar[frame->widthStep * frame->height];  
+  
+    int center_X = frame->width / 2;  
+    int center_Y = frame->height / 2;  
+  
+    int radius = 0;  
+    double theta = 0;  
+    int newX = 0;  
+    int newY = 0;  
+  
+    for (int i = 0; i < frame->width; i++)  
+    {  
+        for (int j = 0; j < frame->height; j++)  
+        {  
+            int tX = i - center_X;  
+            int tY = j - center_Y;  
+  
+            theta = atan2((double)tY, (double)tX);  
+            radius = (int)sqrt((double)(tX * tX) + (double) (tY * tY));  
+            int newR = (int)(sqrt((double)radius) * 12);  
+            newX = center_X + (int)(newR * cos(theta));  
+            newY = center_Y + (int)(newR * sin(theta));  
+  
+            if (!(newX > 0 && newX < frame->width))  
+            {  
+                newX = 0;  
+            }  
+            if (!(newY > 0 && newY < frame->height))  
+            {  
+                newY = 0;  
+            }  
+  
+            new_data[frame->widthStep * j + i * 3] = old_data[frame->widthStep * newY + newX * 3];  
+            new_data[frame->widthStep * j + i * 3 + 1] =old_data[frame->widthStep * newY + newX * 3 + 1];  
+            new_data[frame->widthStep * j + i * 3 + 2] =old_data[frame->widthStep * newY + newX * 3 + 2];  
+        }  
+    }  
+    memcpy(old_data, new_data, sizeof(uchar) * frame->widthStep * frame->height);  
+    delete[] new_data;  
+}  
 
 //图像旋转: src为原图像， dst为新图像, angle为旋转角度, isClip表示是采取缩小图片的方式  
 int EXTfunction::imageRotate(InputArray src, OutputArray dst, double angle, bool isClip)  
@@ -195,6 +294,7 @@ int EXTfunction::cvAdd4cMat_q(cv::Mat &dst, cv::Mat &scr, double scale)
     merge(dstt_channels, dst);    
     return true;    
 }   
+
 /*
 int EXTfunction::prepareToProcessFaceDet()
 {
@@ -370,20 +470,47 @@ bool EXTfunction::ProcessFaceDetect(cv::Mat* in)
     Mat in2   =  in->clone();
     resize( in2, in2, Size(), fx, fx, INTER_LINEAR );
 
-    Mat preprocessedFace = getPreprocessedFace(in2, faceWidth, faceCascade, eyeCascade1, eyeCascade2, preprocessLeftAndRightSeparately, &faceRect, &leftEye, &rightEye, &searchedLeftEye, &searchedRightEye);
+    Point leftEyeTemp,rightEyeTemp;
+    Rect faceRectTemp;
+
+    Mat preprocessedFace = getPreprocessedFace(in2, faceWidth, faceCascade, eyeCascade1, eyeCascade2, preprocessLeftAndRightSeparately, &faceRectTemp, &leftEyeTemp, &rightEyeTemp, &searchedLeftEye, &searchedRightEye);
     //faces.push_back(faceRect);
     gotFaceAndEyes = false;
     if (preprocessedFace.data)
         gotFaceAndEyes = true;
-    faceRect = cv::Rect(faceRect.x * m_Scale,faceRect.y *m_Scale,faceRect.width*m_Scale,faceRect.height*m_Scale);
-    leftEye *=  m_Scale;
-    rightEye *=   m_Scale;
 
-    Point  face_center ;
+    if(5 >= faceRectTemp.width ||  5 >= faceRectTemp.height)
+    {
+        m_eyesStaticCount ++;
+        m_faceStaticCount ++;
+        return false;
+    }else
+    {
+        faceRect = cv::Rect(faceRectTemp.x * m_Scale,faceRectTemp.y *m_Scale,faceRectTemp.width*m_Scale,faceRectTemp.height*m_Scale);
+    }
+    
+    if(5 >= leftEyeTemp.x || 5 >= leftEyeTemp.y || 5 >=  rightEyeTemp.x  || 5 >= leftEyeTemp.y)
+    {
+        m_eyesStaticCount ++;
+        return true;
+    }else
+    {
+        leftEye = leftEyeTemp;
+        rightEye  = rightEyeTemp;
+        leftEye *=  m_Scale;
+        rightEye *=   m_Scale;
+
+        m_eyesWeight = Point(faceRect.width/6,faceRect.height/9);
+    }
+    m_faceStaticCount =  0;
+    m_eyesStaticCount  = 0;
+
+    //Point  face_center ;
     // 在检测到的人脸周围绘制一个矩形
+    /*
     if (faceRect.width > 0) 
     {
-        face_center =  Point(faceRect.x + faceRect.width/2, faceRect.y + faceRect.height/2);
+        //face_center =  Point(faceRect.x + faceRect.width/2, faceRect.y + faceRect.height/2);
         //rectangle(*in, faceRect, CV_RGB(255, 255, 0), 2, CV_AA);
 
         // 用蓝线画出眼睛的位置
@@ -392,11 +519,11 @@ bool EXTfunction::ProcessFaceDetect(cv::Mat* in)
         {   
             //circle(*in, face_center, 6, eyeColor, 1, CV_AA);
 
-            //circle(*in, Point(faceRect.x + leftEye.x, faceRect.y + leftEye.y), 6, eyeColor, 1, CV_AA);
+            circle(*in, Point(faceRect.x + leftEye.x, faceRect.y + leftEye.y), 6, eyeColor, 1, CV_AA);
 
-            //circle(*in, Point(faceRect.x + rightEye.x, faceRect.y + rightEye.y), 6, eyeColor, 1, CV_AA);
+            circle(*in, Point(faceRect.x + rightEye.x, faceRect.y + rightEye.y), 6, eyeColor, 1, CV_AA);
         }
-    }
+    }*/
 
     double ss = atan((double)(leftEye.y - rightEye.y)/(double)(leftEye.x-rightEye.x)) * 180/3.1415926;
     if(abs(ss) > 30  || abs(ss - m_rtHat)  > 30)
@@ -413,6 +540,60 @@ bool EXTfunction::ProcessFaceDetect(cv::Mat* in)
 	return true;
 }
 
+bool EXTfunction::ProcessEye(cv::Mat& in)
+{
+    if(5 >= leftEye.x || 5 >= leftEye.y || 5 >=  rightEye.x  || 5 >= leftEye.y)
+    {
+        return false;
+    }
+
+    if(m_faceStaticCount > FACE_STATIC_THE)
+    {
+        m_faceStaticCount = FACE_STATIC_THE;
+        return false;
+    }
+
+    if(m_eyesStaticCount > EYE_STATIC_THE)
+    {
+        m_eyesStaticCount = EYE_STATIC_THE;
+        return false;
+    }
+
+    // draw eyes
+    Scalar eyeColor = CV_RGB(0,255,255);
+
+    rectangle(in, faceRect, CV_RGB(255, 255, 0), 2, CV_AA);
+    Rect  left = Rect(faceRect.x + leftEye.x - m_eyesWeight.x/2,faceRect.y + leftEye.y - m_eyesWeight.y/2,m_eyesWeight.x,m_eyesWeight.y);
+    Rect  right = Rect(faceRect.x + rightEye.x - m_eyesWeight.x/2,faceRect.y + rightEye.y - m_eyesWeight.y/2,m_eyesWeight.x,m_eyesWeight.y);
+
+    rectangle(in, left, eyeColor, 1, CV_AA);
+
+    rectangle(in, right, eyeColor, 1, CV_AA);
+
+    Mat  orgLeft =  in(left);
+    Mat  orgRight =  in(faceRect);
+
+    imshow("ResLeft", orgLeft);
+
+    imshow("ResRight", orgRight);
+    /*
+    
+    IplImage* leftIpl;
+    IplImage* rightIpl;
+     */
+    IplImage leftIpl = IplImage(orgLeft);
+    IplImage rightIpl = IplImage(orgRight);
+
+    //MaxFrame(&leftIpl);
+    MaxFrame(&rightIpl);
+    //circle(*in, Point(faceRect.x + leftEye.x, faceRect.y + leftEye.y), 6, eyeColor, 1, CV_AA);
+    //circle(*in, Point(faceRect.x + rightEye.x, faceRect.y + rightEye.y), 6, eyeColor, 1, CV_AA);
+
+    //cout << leftEye << rightEye << endl;
+
+    return true;
+}
+
 bool EXTfunction::ProcessFaceBeautification(cv::Mat& frame)
 {
     if(!gotFaceAndEyes)
@@ -425,7 +606,7 @@ bool EXTfunction::ProcessFaceBeautification(cv::Mat& frame)
         return false;
     }
 
-	int KERNEL_SIZE = 31;  
+	int KERNEL_SIZE = 15;  
 	//cout <<": " << faceRect  << endl;
     int radius;
     Mat image_ori = frame(faceRect);
