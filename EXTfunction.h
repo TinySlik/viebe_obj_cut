@@ -55,7 +55,7 @@ public:
         m_eyeDecScale = num;
     }
 
-    
+    void MaxFrame(Mat& frame ,double strength = 0.9, double radius = 0.0);
 private:
     void initDetectors(CascadeClassifier &faceCascade, CascadeClassifier &eyeCascade1, CascadeClassifier &eyeCascade2);
 

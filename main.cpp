@@ -178,17 +178,17 @@ int main(int argc, char* argv[])
         //imshow("VIBE Resoult", frame);
 #endif
         //face dect
-        m_extension.ProcessFaceDetect(&frame);
+        //m_extension.ProcessFaceDetect(&frame);
         
    		//skin beauty
-		m_extension.ProcessFaceBeautification(frame);
+		//m_extension.ProcessFaceBeautification(frame);
 
-		m_extension.ProcessHatThings(frame);
+		//m_extension.ProcessHatThings(frame);
 
-		m_extension.ProcessEye(frame);
+		//m_extension.ProcessEye(frame);
 
 		//hat and box
-		m_extension.ProcessFrameBox(&frame);
+		//m_extension.ProcessFrameBox(&frame);
 
 		imshow("Res", frame);
 		++frameNumber;

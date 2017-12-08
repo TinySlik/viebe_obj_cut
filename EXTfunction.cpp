@@ -26,6 +26,9 @@ using namespace std;
 #define EYE_STATIC_THE 10
 #define FACE_STATIC_THE 10
 
+#define EYE_IN_FACE_WIDTH_PER  0.25
+#define EYE_IN_FACE_HEIGHT_PER  0.25
+
 // 设置期望的人脸维度，设置为70*70
 const int faceWidth = 70;
 const int faceHeight = faceWidth;
@@ -33,14 +36,14 @@ const int faceHeight = faceWidth;
 const bool preprocessLeftAndRightSeparately = true;   // 是否分别对左侧和右侧人脸进行处理的标志
 
 // 级联分类器
-const char *faceCascadeFilename = "./haarcascade_frontalface_alt.xml";     // LBP face detector.
+const char *faceCascadeFilename = "cv_resource/haarcascade_frontalface_alt.xml";     // LBP face detector.
 //const char *faceCascadeFilename = "C:/opencv/sources/data/lbpcascades/haarcascade_frontalface_alt_tree.xml";  // Haar face detector.
 //const char *eyeCascadeFilename1 = "C:/opencv/sources/data/lbpcascades/haarcascade_lefteye_2splits.xml";   // Best eye detector for open-or-closed eyes.
 //const char *eyeCascadeFilename2 = "C:/opencv/sources/data/lbpcascades/haarcascade_righteye_2splits.xml";   // Best eye detector for open-or-closed eyes.
 //const char *eyeCascadeFilename1 = "C:/opencv/sources/data/lbpcascades/haarcascade_mcs_lefteye.xml";       // Good eye detector for open-or-closed eyes.
 //const char *eyeCascadeFilename2 = "C:/opencv/sources/data/lbpcascades/haarcascade_mcs_righteye.xml";       // Good eye detector for open-or-closed eyes.
-const char *eyeCascadeFilename1 = "./haarcascade_eye.xml";               // Basic eye detector for open eyes only.
-const char *eyeCascadeFilename2 = "./haarcascade_eye_tree_eyeglasses.xml"; // Basic eye detector for open eyes if they might wear glasses.
+const char *eyeCascadeFilename1 = "cv_resource/haarcascade_eye.xml";               // Basic eye detector for open eyes only.
+const char *eyeCascadeFilename2 = "cv_resource/haarcascade_eye_tree_eyeglasses.xml"; // Basic eye detector for open eyes if they might wear glasses.
 
 
 EXTfunction::EXTfunction()
@@ -50,10 +53,10 @@ EXTfunction::EXTfunction()
     gotFaceAndEyes = false;
     m_rtHat  = 0;
 	//to do
-	myMat= imread("frameBox3.png",-1); 
+	myMat= imread("cv_resource/frameBox3.png",-1); 
 	//imageRotate(myMat, myMat, 30, false);
 
-	m_Hat= imread("hat2.png",-1);
+	m_Hat= imread("cv_resource/hat2.png",-1);
 	
     m_eyesStaticCount =  0;
 
@@ -119,6 +122,45 @@ void EXTfunction::MaxFrame(IplImage* frame)
     memcpy(old_data, new_data, sizeof(uchar) * frame->widthStep * frame->height);  
     delete[] new_data;  
 }  
+
+void EXTfunction::MaxFrame(Mat& frame ,double strength, double radius)
+{
+    double center_X = frame.cols / 2.0;  
+    double center_Y = frame.rows / 2.0;   
+
+    if (radius < 0.001)
+    {
+        radius = frame.cols > frame.rows ? (frame.rows/2 - 1): (frame.cols/2 - 1);
+    }
+
+    int nr=frame.rows;
+    // 将3通道转换为1通道
+    int nl=frame.cols*frame.channels();
+
+    if(2*radius > frame.cols || 2*radius > frame.rows)
+    {
+        cout  << "to smale img col "<< frame.cols  << "rows"   << frame.rows <<  "with radious" << radius <<  "to max frame done.\n" << endl;
+        return ;
+    }
+    
+    Mat newFrame  = frame.clone();
+    cout  << "frame.cols"   << frame.cols << "frame.rows" << frame.rows  << endl;
+    for(int i=0;i<frame.rows;i++)
+    {
+        for(int j=0;j<frame.cols;j++)
+        {
+            double distance =  sqrt((j  - center_X)*(j  - center_X)+(i - center_Y)*(i - center_Y));
+            if(distance < radius)
+            {
+                int xx  = j - strength*(j - center_X)*(radius - distance)/radius;
+                int yy = i - strength*(i - center_Y)*(radius - distance)/radius;
+                frame.at<Vec3b>(i,j)[0]=newFrame.at<Vec3b>(yy , xx)[0];
+                frame.at<Vec3b>(i,j)[1]=newFrame.at<Vec3b>(yy , xx)[1];
+                frame.at<Vec3b>(i,j)[2]=newFrame.at<Vec3b>(yy , xx)[2];
+            }
+        }
+    }
+}
   
   
 void EXTfunction::MinFrame(IplImage* frame)  
@@ -500,7 +542,7 @@ bool EXTfunction::ProcessFaceDetect(cv::Mat* in)
         leftEye *=  m_Scale;
         rightEye *=   m_Scale;
 
-        m_eyesWeight = Point(faceRect.width/6,faceRect.height/9);
+        m_eyesWeight = Point(faceRect.width  *  EYE_IN_FACE_WIDTH_PER,faceRect.height * EYE_IN_FACE_HEIGHT_PER);
     }
     m_faceStaticCount =  0;
     m_eyesStaticCount  = 0;
@@ -566,26 +608,29 @@ bool EXTfunction::ProcessEye(cv::Mat& in)
     Rect  left = Rect(faceRect.x + leftEye.x - m_eyesWeight.x/2,faceRect.y + leftEye.y - m_eyesWeight.y/2,m_eyesWeight.x,m_eyesWeight.y);
     Rect  right = Rect(faceRect.x + rightEye.x - m_eyesWeight.x/2,faceRect.y + rightEye.y - m_eyesWeight.y/2,m_eyesWeight.x,m_eyesWeight.y);
 
-    rectangle(in, left, eyeColor, 1, CV_AA);
+    //rectangle(in, left, eyeColor, 1, CV_AA);
 
-    rectangle(in, right, eyeColor, 1, CV_AA);
+    //rectangle(in, right, eyeColor, 1, CV_AA);
 
     Mat  orgLeft =  in(left);
-    Mat  orgRight =  in(faceRect);
+    Mat  orgRight =  in(right);
 
-    imshow("ResLeft", orgLeft);
+    //imshow("ResLeft", orgLeft);
 
-    imshow("ResRight", orgRight);
+    //imshow("ResRight", orgRight);
     /*
-    
     IplImage* leftIpl;
     IplImage* rightIpl;
      */
-    IplImage leftIpl = IplImage(orgLeft);
-    IplImage rightIpl = IplImage(orgRight);
+    //IplImage leftIpl = IplImage(orgLeft);
+    //IplImage rightIpl = IplImage(orgRight);
 
-    //MaxFrame(&leftIpl);
-    MaxFrame(&rightIpl);
+    MaxFrame(orgRight,0.3);
+
+    MaxFrame(orgLeft,0.3);
+
+
+    //MaxFrame(&rightIpl);
     //circle(*in, Point(faceRect.x + leftEye.x, faceRect.y + leftEye.y), 6, eyeColor, 1, CV_AA);
     //circle(*in, Point(faceRect.x + rightEye.x, faceRect.y + rightEye.y), 6, eyeColor, 1, CV_AA);
 
